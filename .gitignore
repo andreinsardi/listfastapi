@@ -1,0 +1,21 @@
+# Arquivos e diretórios específicos para o Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+env/
+*.env
+
+# Logs e arquivos de saída
+*.log
+logs/
+*.db
+
+# Arquivos de configuração específicos do projeto
+config.ini
+
+# Dependências geradas pelo pip
+requirements.txt
