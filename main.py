@@ -8,7 +8,7 @@ import datetime
 
 app = FastAPI()
 
-engine = create_engine('postgresql://postgres:root@localhost:6700/postgres')
+engine = create_engine('postgresql://postgres:root@localhost:5432/postgres')
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 session = SessionLocal()
@@ -50,11 +50,21 @@ def create_author(name: str, age: int):
 @app.put("/authors")
 def put_author(id: str, name: str, age: int):
     author = session.query(Author).filter_by(id=id).first()
-    author.name = name
-    author.age = age
-    session.commit()
+    content_reponse = {}
+    status_code = 200   
 
-    return JSONResponse(content={'id': author.id, 'name': author.name, 'age': author.age})
+    if author is not None:
+        author.name = name
+        author.age = age
+        session.commit()
+        content_reponse = {'id': author.id, 'name': author.name, 'age': author.age}
+
+        
+    else:
+        content_reponse = {'message': 'Author not found'} 
+        status_code=404
+    
+    return JSONResponse(content=content_reponse, status_code=status_code)
 
 @app.get("/authors")
 def read_authors():
@@ -105,8 +115,9 @@ def posts_and_author():
     list = []
 
     for item in query:
+        posts = []
         for post in item.post:
-            posts = {'id': post.id, 'text': post.text, 'created': str(post.created), 'authorid': post.authorid, 'subtitle': post.subtitle}
+            posts.append({'id': post.id, 'text': post.text, 'created': str(post.created), 'authorid': post.authorid, 'subtitle': post.subtitle})
         dict = {'id': item.id, 'name': item.name, 'age': item.age, 'post': posts}
         list.append(dict)
 
